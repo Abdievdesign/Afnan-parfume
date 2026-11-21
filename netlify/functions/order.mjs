@@ -1,5 +1,5 @@
 // Buyurtmani Telegram'ga yuboruvchi Netlify funksiyasi.
-// Buyurtma avval Supabase'dagi "buyurtmalar" jadvaliga yoziladi, keyin Telegram'ga yuboriladi.
+// Buyurtma avval Supabase'dagi "buyurtmalar1" jadvaliga yoziladi, keyin Telegram'ga yuboriladi.
 // Barcha kalitlar faqat Netlify muhit o'zgaruvchilaridan olinadi:
 //   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, SUPABASE_URL, SUPABASE_SECRET_KEY
 // Supabase'ga yozib bo'lmasa ham Telegram xabari yuboriladi, xato faqat logga yoziladi.
@@ -37,7 +37,7 @@ async function saveToSupabase(row) {
   // Eski JWT ko'rinishidagi kalitlar Authorization sarlavhasini ham talab qiladi; yangi sb_secret_ kalitlar — yo'q.
   if (!key.startsWith('sb_')) headers.Authorization = `Bearer ${key}`;
   try {
-    const r = await fetch(`${url}/rest/v1/buyurtmalar`, {
+    const r = await fetch(`${url}/rest/v1/buyurtmalar1`, {
       method: 'POST', headers, body: JSON.stringify(row), signal: AbortSignal.timeout(5000),
     });
     if (!r.ok) console.error('Supabase xatosi', r.status, await r.text());
