@@ -1,6 +1,8 @@
 // Buyurtmani Telegram'ga yuboruvchi Netlify funksiyasi.
-// Token va chat ID faqat Netlify muhit o'zgaruvchilaridan olinadi:
-//   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+// Buyurtma avval Supabase'dagi "buyurtmalar" jadvaliga yoziladi, keyin Telegram'ga yuboriladi.
+// Barcha kalitlar faqat Netlify muhit o'zgaruvchilaridan olinadi:
+//   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, SUPABASE_URL, SUPABASE_SECRET_KEY
+// Supabase'ga yozib bo'lmasa ham Telegram xabari yuboriladi, xato faqat logga yoziladi.
 
 // Narxlar serverda ham saqlanadi, shunda brauzerdan soxta narx yuborib bo'lmaydi.
 // index.html dagi "products" ro'yxati o'zgarsa, bu ro'yxatni ham xuddi shu tartibda yangilang.
@@ -22,6 +24,27 @@ const json = (status, data) => new Response(JSON.stringify(data), {
 });
 const fmt = n => n.toLocaleString('ru-RU').replace(/\s/g, ' ') + ' so‘m';
 const clean = v => (typeof v === 'string' ? v.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').trim() : '');
+
+// Buyurtmani Supabase'ga yozadi. Hech qachon xato tashlamaydi — faqat logga yozadi.
+async function saveToSupabase(row) {
+  const url = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  const key = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) {
+    console.error('SUPABASE_URL yoki SUPABASE_SECRET_KEY sozlanmagan — buyurtma bazaga yozilmadi');
+    return;
+  }
+  const headers = { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+  // Eski JWT ko'rinishidagi kalitlar Authorization sarlavhasini ham talab qiladi; yangi sb_secret_ kalitlar — yo'q.
+  if (!key.startsWith('sb_')) headers.Authorization = `Bearer ${key}`;
+  try {
+    const r = await fetch(`${url}/rest/v1/buyurtmalar`, {
+      method: 'POST', headers, body: JSON.stringify(row), signal: AbortSignal.timeout(5000),
+    });
+    if (!r.ok) console.error('Supabase xatosi', r.status, await r.text());
+  } catch (e) {
+    console.error('Supabase bilan bog‘lanishda xato', e);
+  }
+}
 
 function rateLimited(ip) {
   const now = Date.now();
@@ -62,19 +85,24 @@ export default async (req, context) => {
   if (phone.length > LIMITS.phone || !/^[\d\s()+-]+$/.test(phone) || digits.length < 9 || digits.length > 13)
     return json(400, { ok: false, error: 'Telefon raqamini to‘g‘ri kiriting.' });
   if (comment.length > LIMITS.comment) return json(400, { ok: false, error: 'Izoh juda uzun.' });
+  if (data.rozilik !== true) return json(400, { ok: false, error: 'Buyurtma berish uchun rozilik belgisini qo‘ying.' });
 
   if (!Array.isArray(data.items) || !data.items.length || data.items.length > LIMITS.items)
     return json(400, { ok: false, error: 'Savat bo‘sh.' });
 
   const lines = [];
+  const mahsulotlar = [];
   let total = 0;
   for (const it of data.items) {
     const p = CATALOG[it?.i];
     const q = Number(it?.q);
     if (!p || !Number.isInteger(q) || q < 1 || q > LIMITS.qty) return json(400, { ok: false, error: 'Savatda xato bor.' });
     total += p.price * q;
+    mahsulotlar.push({ nomi: p.name, soni: q, narxi: p.price, summa: p.price * q });
     lines.push(`• ${p.name} — ${q} dona × ${fmt(p.price)} = ${fmt(p.price * q)}`);
   }
+
+  await saveToSupabase({ ism: name, telefon: phone, izoh: comment || null, mahsulotlar, jami: total, rozilik: true });
 
   const text = [
     '🛍 Yangi buyurtma — Afnan parfume',
