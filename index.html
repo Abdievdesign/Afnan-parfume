@@ -225,6 +225,22 @@
   .order-phone .ic svg{width:20px;height:20px}
   .order-phone small{display:block;color:var(--muted-l);font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
   .order-phone a{font-size:1.2rem;font-weight:800;color:var(--leaf)}
+  .order-phone[hidden],.order-form[hidden],.order-done[hidden]{display:none}
+  .order-form{display:grid;gap:12px;margin-bottom:16px}
+  .field{display:grid;gap:6px}
+  .field label{font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-d)}
+  .field input,.field textarea{width:100%;font:inherit;font-size:.95rem;color:var(--ink);padding:12px 14px;border:1px solid var(--line-d);border-radius:14px;background:#fff;transition:border-color .2s}
+  .field textarea{resize:vertical;min-height:80px}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--green)}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .form-msg{font-size:.88rem;color:#9b2c2c;min-height:0}
+  .form-msg:empty{display:none}
+  .order-done{text-align:center;padding:10px 0 4px}
+  .order-done .ic{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:var(--green);color:var(--leaf)}
+  .order-done .ic svg{width:28px;height:28px}
+  .order-done h4{padding:0;margin-bottom:8px}
+  .order-done p{color:var(--muted-d);margin-bottom:20px}
+  .btn[disabled]{opacity:.6;cursor:wait;transform:none}
 
   .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1)}
   .reveal.in{opacity:1;transform:none}
@@ -495,17 +511,43 @@
   <div class="modal-box">
     <button class="modal-close" id="mClose" aria-label="Yopish">×</button>
     <div class="m-inner">
-      <span class="eyebrow">Buyurtma</span>
-      <h4 id="mTitle" style="margin:6px 0 16px">Buyurtmangiz ro‘yxati</h4>
-      <ul class="order-list" id="orderList"></ul>
-      <div class="total"><span style="color:var(--muted-d)">Jami:</span><b id="mTotal"></b></div>
-      <div class="order-phone">
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
-        <span><small>Buyurtmani tasdiqlash uchun qo‘ng‘iroq qiling</small><a href="tel:+998901234567">+998 90 123 45 67</a></span>
-      </div>
-      <div class="modal-actions">
-        <a class="btn btn-green" href="tel:+998901234567">Qo‘ng‘iroq qilish</a>
-        <button class="btn btn-ghost-d" id="mDone">Yopish</button>
+      <form class="order-form" id="orderForm" novalidate>
+        <div>
+          <span class="eyebrow">Buyurtma</span>
+          <h4 id="mTitle" style="margin:6px 0 16px">Buyurtmangiz ro‘yxati</h4>
+          <ul class="order-list" id="orderList"></ul>
+          <div class="total" style="margin-bottom:4px"><span style="color:var(--muted-d)">Jami:</span><b id="mTotal"></b></div>
+        </div>
+        <div class="field">
+          <label for="fName">Ismingiz</label>
+          <input id="fName" name="name" type="text" autocomplete="name" required minlength="2" maxlength="60" placeholder="Masalan: Dilnoza">
+        </div>
+        <div class="field">
+          <label for="fPhone">Telefon raqamingiz</label>
+          <input id="fPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="+998 __ ___ __ __">
+        </div>
+        <div class="field">
+          <label for="fComment">Manzil yoki izoh</label>
+          <textarea id="fComment" name="comment" maxlength="500" rows="3" placeholder="Yetkazib berish manzili yoki qo‘shimcha izoh"></textarea>
+        </div>
+        <div class="hp" aria-hidden="true">
+          <label for="fWebsite">Bu maydonni bo‘sh qoldiring</label>
+          <input id="fWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="form-msg" id="formMsg" role="alert"></p>
+        <div class="order-phone" id="orderPhone" hidden>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+          <span><small>Buyurtma berish uchun qo‘ng‘iroq qiling</small><a href="tel:+998901234567">+998 90 123 45 67</a></span>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-green" id="fSubmit">Yuborish</button>
+        </div>
+      </form>
+      <div class="order-done" id="orderDone" hidden>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h4>Rahmat! Buyurtmangiz qabul qilindi</h4>
+        <p>Tez orada siz bilan bog‘lanamiz.</p>
+        <div class="modal-actions"><button type="button" class="btn btn-green" id="mDone">Yopish</button></div>
       </div>
     </div>
   </div>
@@ -585,18 +627,66 @@
   document.getElementById('cartClear').onclick = ()=>{ cart = {}; renderCart(); };
 
   const modal = document.getElementById('modal');
+  const form = document.getElementById('orderForm');
+  const done = document.getElementById('orderDone');
+  const msg = document.getElementById('formMsg');
+  const phoneBox = document.getElementById('orderPhone');
+  const submitBtn = document.getElementById('fSubmit');
+  let openedAt = 0, sending = false;
+
   document.getElementById('cartOrder').onclick = ()=>{
     if(!cartQty()) return;
     document.getElementById('orderList').innerHTML = items().map(({p,q})=>
       `<li><span>${esc(p.name)} — ${q} dona</span><b>${fmt(p.price*q)}</b></li>`).join('');
     document.getElementById('mTotal').textContent = fmt(cartTotal());
+    form.hidden = false; done.hidden = true; msg.textContent = ''; phoneBox.hidden = true;
+    openedAt = Date.now();
     modal.classList.add('open'); document.body.style.overflow='hidden';
+    setTimeout(()=>document.getElementById('fName').focus(), 50);
   };
   const close = ()=>{ modal.classList.remove('open'); document.body.style.overflow=''; };
   document.getElementById('mClose').onclick = close;
   document.getElementById('mDone').onclick = close;
   modal.addEventListener('click', e=>{ if(e.target===modal) close(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+
+  const fail = (text, showPhone)=>{ msg.textContent = text; phoneBox.hidden = !showPhone; };
+
+  form.addEventListener('submit', async e=>{
+    e.preventDefault();
+    if(sending) return;
+    const name = form.elements.name.value.trim(), phone = form.elements.phone.value.trim(), comment = form.elements.comment.value.trim();
+    const digits = phone.replace(/\D/g,'');
+    if(!cartQty()) return fail('Savat bo‘sh.', false);
+    if(name.length < 2 || name.length > 60) return fail('Iltimos, ismingizni kiriting (2–60 ta belgi).', false);
+    if(!/^[\d\s()+-]+$/.test(phone) || digits.length < 9 || digits.length > 13) return fail('Iltimos, telefon raqamingizni to‘g‘ri kiriting.', false);
+    if(comment.length > 500) return fail('Izoh 500 ta belgidan oshmasin.', false);
+
+    sending = true; submitBtn.disabled = true; submitBtn.textContent = 'Yuborilmoqda…'; fail('', false);
+    try{
+      const res = await fetch('/api/order', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          name, phone, comment,
+          website: form.elements.website.value,
+          elapsed: Date.now() - openedAt,
+          items: items().map(({i,q})=>({i:Number(i), q}))
+        })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.ok){
+        const userError = res.status === 400 || res.status === 429;
+        fail((userError && data.error) ? data.error : 'Buyurtmani yuborib bo‘lmadi. Iltimos, qo‘ng‘iroq qiling:', true);
+        return;
+      }
+      cart = {}; renderCart(); form.reset();
+      form.hidden = true; done.hidden = false;
+    }catch(err){
+      fail('Buyurtmani yuborib bo‘lmadi. Iltimos, qo‘ng‘iroq qiling:', true);
+    }finally{
+      sending = false; submitBtn.disabled = false; submitBtn.textContent = 'Yuborish';
+    }
+  });
   renderCart();
 
   const header = document.getElementById('header');
