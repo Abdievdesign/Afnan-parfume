@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maxfiylik siyosati — Afnan parfume</title>
+<meta name="description" content="Afnan parfume buyurtma berishda qanday ma’lumotlarni yig‘adi, ulardan nima uchun foydalanadi, qancha saqlaydi va ularni qanday o‘chirish mumkin.">
+<meta name="theme-color" content="#132F18">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#132F18;
+    --green-l:#2c5a35;
+    --leaf:#E5DA80;
+    --cream:#F7F4EA;
+    --ink:#132F18;
+    --muted-d:#5d6b5f;
+    --muted-l:#b7c2b4;
+    --line-d:rgba(19,47,24,.12);
+    --line-l:rgba(229,218,128,.2);
+    --radius:24px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .container{width:min(820px,100% - 32px);margin-inline:auto}
+  header{background:var(--green);color:var(--cream);padding:22px 0}
+  header .container{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .brand{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--leaf)}
+  .back{font-size:.9rem;font-weight:600;color:var(--cream);border:1px solid var(--line-l);padding:9px 18px;border-radius:999px;transition:border-color .25s,color .25s}
+  .back:hover{border-color:var(--leaf);color:var(--leaf)}
+  main{padding:56px 0 72px}
+  .eyebrow{font-size:.76rem;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--green-l)}
+  h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,6vw,3.2rem);font-weight:700;line-height:1.1;margin:8px 0 12px}
+  .lead{color:var(--muted-d);margin-bottom:36px}
+  section{background:#fff;border-radius:var(--radius);padding:28px 30px;margin-bottom:18px;box-shadow:0 1px 0 var(--line-d),0 18px 40px -28px rgba(19,47,24,.35)}
+  h2{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;line-height:1.2;margin-bottom:10px}
+  p+p,p+ul,ul+p{margin-top:10px}
+  ul{padding-left:20px}
+  li+li{margin-top:4px}
+  section a{color:var(--green);font-weight:700;border-bottom:2px solid var(--leaf)}
+  .updated{color:var(--muted-d);font-size:.86rem;margin-top:28px}
+  footer{background:var(--green);color:var(--muted-l);padding:28px 0;font-size:.86rem;text-align:center}
+  @media (max-width:560px){ section{padding:22px 18px} main{padding:40px 0 56px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <a href="index.html" class="brand">Afnan parfume</a>
+    <a href="index.html" class="back">← Bosh sahifaga qaytish</a>
+  </div>
+</header>
+
+<main class="container">
+  <span class="eyebrow">Hujjatlar</span>
+  <h1>Maxfiylik siyosati</h1>
+  <p class="lead">Bu sahifada saytimiz orqali buyurtma berganingizda qanday ma’lumotlaringizni olishimiz, ulardan nima uchun foydalanishimiz, ularni qancha vaqt saqlashimiz va ularni qanday o‘chirishni so‘rashingiz mumkinligi tushuntirilgan.</p>
+
+  <section>
+    <h2>Qanday ma’lumotlar yig‘iladi</h2>
+    <p>Buyurtma formasini yuborganingizda quyidagilarni olamiz:</p>
+    <ul>
+      <li>ismingiz;</li>
+      <li>telefon raqamingiz;</li>
+      <li>manzil yoki izoh (agar yozgan bo‘lsangiz);</li>
+      <li>buyurtma qilingan mahsulotlar, ularning soni va jami summa;</li>
+      <li>ma’lumotlaringizdan foydalanishga rozilik berganingiz va buyurtma vaqti.</li>
+    </ul>
+    <p>Saytni ko‘p marta yuborishdan himoya qilish uchun IP manzilingiz qisqa muddat (10 daqiqagacha) server xotirasida tutiladi va bazaga yozilmaydi. Sayt reklama yoki kuzatuv cookie-fayllaridan foydalanmaydi.</p>
+  </section>
+
+  <section>
+    <h2>Nima uchun foydalaniladi</h2>
+    <p>Ma’lumotlaringiz faqat buyurtmangizni bajarish uchun ishlatiladi: siz bilan bog‘lanib buyurtmani tasdiqlash, yetkazib berishni kelishish va keyinchalik shu buyurtma bo‘yicha savollaringizga javob berish.</p>
+    <p>Ma’lumotlaringizni sotmaymiz va reklama maqsadida boshqalarga bermaymiz. Buyurtmani qabul qilish uchun ular quyidagi xizmatlar orqali o‘tadi va saqlanadi:</p>
+    <ul>
+      <li>Netlify — sayt va buyurtma qabul qiluvchi server joylashgan xizmat;</li>
+      <li>Supabase — buyurtmalar saqlanadigan ma’lumotlar bazasi;</li>
+      <li>Telegram — buyurtma haqidagi xabar do‘kon xodimlariga yuboriladigan messenjer.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Qancha saqlanadi</h2>
+    <p>Buyurtma ma’lumotlari buyurtma berilgan kundan boshlab 12 oy saqlanadi, so‘ngra o‘chiriladi. Agar qonun hujjatlari uzoqroq saqlashni talab qilsa, ma’lumotlar faqat shu talab bajarilishi uchun zarur muddatgacha saqlanadi.</p>
+  </section>
+
+  <section>
+    <h2>O‘chirishni qanday so‘rash mumkin</h2>
+    <p>Siz istalgan vaqtda o‘zingiz haqingizdagi ma’lumotlarni ko‘rish, tuzatish yoki o‘chirishni so‘rashingiz mumkin. Buning uchun bizga <a href="tel:+998914925989">+998 91 492 59 89</a> raqamiga qo‘ng‘iroq qiling yoki do‘konimizga murojaat qiling: Andijon shahri, Sanoat ko‘chasi.</p>
+    <p>Murojaat qilganingizda buyurtmada ko‘rsatgan ism va telefon raqamingizni ayting — shu orqali buyurtmangizni topamiz. So‘rovingiz 30 kun ichida bajariladi va bu haqda sizga xabar beramiz.</p>
+  </section>
+
+  <p class="updated">Oxirgi yangilanish: 2026-yil 21-noyabr</p>
+</main>
+
+<footer>
+  <div class="container">© 2026 Afnan parfume · Andijon shahri, Sanoat ko‘chasi</div>
+</footer>
+</body>
+</html>

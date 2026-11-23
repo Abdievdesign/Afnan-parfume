@@ -232,6 +232,9 @@
   .field input,.field textarea{width:100%;font:inherit;font-size:.95rem;color:var(--ink);padding:12px 14px;border:1px solid var(--line-d);border-radius:14px;background:#fff;transition:border-color .2s}
   .field textarea{resize:vertical;min-height:80px}
   .field input:focus,.field textarea:focus{outline:none;border-color:var(--green)}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;line-height:1.45;color:var(--ink);cursor:pointer}
+  .consent input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--green);cursor:pointer}
+  .consent a{color:var(--green);font-weight:700;border-bottom:2px solid var(--leaf)}
   .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   .form-msg{font-size:.88rem;color:#9b2c2c;min-height:0}
   .form-msg:empty{display:none}
@@ -491,7 +494,7 @@
     <div class="foot">
       <a href="#home" aria-label="Afnan parfume"><svg class="logo-svg" viewBox="16.2 8.5 288.6 203.4" aria-hidden="true"><use href="#logo"/></svg></a>
       <nav class="foot-links">
-        <a href="#about">Biz haqimizda</a><a href="#products">Mahsulotlar</a><a href="#contact">Aloqa</a><a href="tel:+998914925989">+998 91 492 59 89</a>
+        <a href="#about">Biz haqimizda</a><a href="#products">Mahsulotlar</a><a href="#contact">Aloqa</a><a href="privacy.html">Maxfiylik siyosati</a><a href="tel:+998914925989">+998 91 492 59 89</a>
       </nav>
     </div>
     <div class="foot-bottom">
@@ -530,6 +533,10 @@
           <label for="fComment">Manzil yoki izoh</label>
           <textarea id="fComment" name="comment" maxlength="500" rows="3" placeholder="Yetkazib berish manzili yoki qo‘shimcha izoh"></textarea>
         </div>
+        <label class="consent" for="fConsent">
+          <input id="fConsent" name="consent" type="checkbox" required>
+          <span>Ma’lumotlarim buyurtmani bajarish uchun ishlatilishiga roziman. <a href="privacy.html" target="_blank" rel="noopener">Maxfiylik siyosati</a></span>
+        </label>
         <div class="hp" aria-hidden="true">
           <label for="fWebsite">Bu maydonni bo‘sh qoldiring</label>
           <input id="fWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
@@ -661,6 +668,7 @@
     if(name.length < 2 || name.length > 60) return fail('Iltimos, ismingizni kiriting (2–60 ta belgi).', false);
     if(!/^[\d\s()+-]+$/.test(phone) || digits.length < 9 || digits.length > 13) return fail('Iltimos, telefon raqamingizni to‘g‘ri kiriting.', false);
     if(comment.length > 500) return fail('Izoh 500 ta belgidan oshmasin.', false);
+    if(!form.elements.consent.checked) return fail('Buyurtma berish uchun ma’lumotlaringizdan foydalanishga rozilik belgisini qo‘ying.', false);
 
     sending = true; submitBtn.disabled = true; submitBtn.textContent = 'Yuborilmoqda…'; fail('', false);
     try{
@@ -668,6 +676,7 @@
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
           name, phone, comment,
+          rozilik: form.elements.consent.checked,
           website: form.elements.website.value,
           elapsed: Date.now() - openedAt,
           items: items().map(({i,q})=>({i:Number(i), q}))
