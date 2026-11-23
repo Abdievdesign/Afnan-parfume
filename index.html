@@ -7,6 +7,7 @@
 <meta name="description" content="Afnan parfume — Andijonda parfumeriya va kosmetika mahsulotlarining ulgurji va chakana savdosi. Sifatli mahsulotlar, qulay narxlar, ishonchli xizmat.">
 <meta name="theme-color" content="#132F18">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23132F18'/%3E%3Ctext x='32' y='44' font-family='Georgia' font-size='34' text-anchor='middle' fill='%23E5DA80'%3EA%3C/text%3E%3C/svg%3E">
+<script async src="https://telegram.org/js/telegram-web-app.js" onload="window.__tgInit&&window.__tgInit()"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -648,6 +649,7 @@
     document.getElementById('mTotal').textContent = fmt(cartTotal());
     form.hidden = false; done.hidden = true; msg.textContent = ''; phoneBox.hidden = true;
     openedAt = Date.now();
+    tgFillName(); tgCloseBtn(false);
     modal.classList.add('open'); document.body.style.overflow='hidden';
     setTimeout(()=>document.getElementById('fName').focus(), 50);
   };
@@ -656,6 +658,22 @@
   document.getElementById('mDone').onclick = close;
   modal.addEventListener('click', e=>{ if(e.target===modal) close(); });
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+
+  /* Telegram Mini App: sayt Telegram ichida ochilganda ishlaydi, oddiy brauzerda hech narsa o'zgarmaydi */
+  const tgApp = ()=>{ const w = window.Telegram && window.Telegram.WebApp; return w && w.initData ? w : null; };
+  window.__tgInit = ()=>{ const tg = tgApp(); if(!tg || tg._afnan) return; tg._afnan = true; tg.ready(); tg.expand(); };
+  window.__tgInit();
+  const tgFillName = ()=>{
+    const tg = tgApp(), u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user, f = form.elements.name;
+    if(u && !f.value.trim()) f.value = [u.first_name, u.last_name].filter(Boolean).join(' ').trim().slice(0, 60);
+  };
+  const tgCloseBtn = show=>{
+    const tg = tgApp(); if(!tg) return;
+    const mb = tg.MainButton;
+    if(!tg._afnanClose){ tg._afnanClose = ()=>tg.close(); mb.onClick(tg._afnanClose); }
+    if(show) mb.setParams({ text:'Telegram oynasini yopish', color:'#132F18', text_color:'#E5DA80', is_visible:true });
+    else mb.hide();
+  };
 
   const fail = (text, showPhone)=>{ msg.textContent = text; phoneBox.hidden = !showPhone; };
 
@@ -690,6 +708,7 @@
       }
       cart = {}; renderCart(); form.reset();
       form.hidden = true; done.hidden = false;
+      tgCloseBtn(true);
     }catch(err){
       fail('Buyurtmani yuborib bo‘lmadi. Iltimos, qo‘ng‘iroq qiling:', true);
     }finally{
