@@ -25,25 +25,71 @@ const json = (status, data) => new Response(JSON.stringify(data), {
 const fmt = n => n.toLocaleString('ru-RU').replace(/\s/g, ' ') + ' so‘m';
 const clean = v => (typeof v === 'string' ? v.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').trim() : '');
 
+// Muhit o'zgaruvchilaridagi tez-tez uchraydigan xatolarni tuzatadi:
+// bo'sh joy, qo'shtirnoq, oxiridagi "/" yoki "/rest/v1".
+function supabaseConfig() {
+  const strip = v => (v || '').trim().replace(/^["']|["']$/g, '').trim();
+  const url = strip(process.env.SUPABASE_URL).replace(/\/+$/, '').replace(/\/rest\/v1$/, '');
+  const key = strip(process.env.SUPABASE_SECRET_KEY);
+  const headers = { apikey: key, 'Content-Type': 'application/json' };
+  // Eski JWT ko'rinishidagi kalitlar Authorization sarlavhasini ham talab qiladi; yangi sb_secret_ kalitlar — yo'q.
+  if (key && !key.startsWith('sb_')) headers.Authorization = `Bearer ${key}`;
+  return { url, key, headers };
+}
+
+// Kalit turini aniqlaydi (kalitning o'zini oshkor qilmasdan).
+function keyKind(key) {
+  if (!key) return 'yo‘q';
+  if (key.startsWith('sb_secret_')) return 'sb_secret (to‘g‘ri)';
+  if (key.startsWith('sb_publishable_')) return 'sb_publishable (NOTO‘G‘RI — secret kalit kerak)';
+  try {
+    const role = JSON.parse(Buffer.from(key.split('.')[1], 'base64url').toString()).role;
+    return role === 'service_role' ? 'service_role JWT (to‘g‘ri)' : `${role} JWT (NOTO‘G‘RI — service_role kerak)`;
+  } catch { return 'noma’lum format (NOTO‘G‘RI)'; }
+}
+
 // Buyurtmani Supabase'ga yozadi. Hech qachon xato tashlamaydi — faqat logga yozadi.
 async function saveToSupabase(row) {
-  const url = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
-  const key = process.env.SUPABASE_SECRET_KEY;
+  const { url, key, headers } = supabaseConfig();
   if (!url || !key) {
     console.error('SUPABASE_URL yoki SUPABASE_SECRET_KEY sozlanmagan — buyurtma bazaga yozilmadi');
     return;
   }
-  const headers = { apikey: key, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
-  // Eski JWT ko'rinishidagi kalitlar Authorization sarlavhasini ham talab qiladi; yangi sb_secret_ kalitlar — yo'q.
-  if (!key.startsWith('sb_')) headers.Authorization = `Bearer ${key}`;
   try {
     const r = await fetch(`${url}/rest/v1/buyurtmalar1`, {
-      method: 'POST', headers, body: JSON.stringify(row), signal: AbortSignal.timeout(5000),
+      method: 'POST', headers: { ...headers, Prefer: 'return=minimal' },
+      body: JSON.stringify(row), signal: AbortSignal.timeout(5000),
     });
     if (!r.ok) console.error('Supabase xatosi', r.status, await r.text());
   } catch (e) {
     console.error('Supabase bilan bog‘lanishda xato', e);
   }
+}
+
+// /api/order?tekshir — Supabase sozlamasini tekshiradi. Jadvalga hech narsa yozmaydi,
+// kalitlarning o'zini ko'rsatmaydi.
+async function checkSupabase() {
+  const { url, key, headers } = supabaseConfig();
+  const res = {
+    SUPABASE_URL: url ? url.replace(/^https?:\/\//, '') : 'yo‘q',
+    SUPABASE_SECRET_KEY: keyKind(key),
+    TELEGRAM: process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID ? 'sozlangan' : 'yo‘q',
+  };
+  if (!url || !key) return { ...res, natija: 'Netlify funksiyasi Supabase o‘zgaruvchilarini ko‘rmayapti. Scope’da “Functions” belgilanganini tekshiring va qayta deploy qiling.' };
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url))
+    res.ogohlantirish = 'SUPABASE_URL https://<loyiha-id>.supabase.co ko‘rinishida bo‘lishi kerak (Project Settings → API / Data API).';
+  try {
+    const cols = 'id,yaratilgan,ism,telefon,izoh,mahsulotlar,jami,rozilik';
+    const r = await fetch(`${url}/rest/v1/buyurtmalar1?select=${cols}&limit=1`, { headers, signal: AbortSignal.timeout(5000) });
+    const body = await r.text();
+    res.supabase_status = r.status;
+    if (r.ok) res.natija = 'Hammasi joyida: jadval topildi, kalit ishlayapti.';
+    else res.natija = 'Supabase xato qaytardi', res.supabase_javobi = body.slice(0, 400);
+  } catch (e) {
+    res.natija = 'Supabase manziliga ulanib bo‘lmadi — SUPABASE_URL noto‘g‘ri.';
+    res.xato = String(e?.cause?.code || e?.message || e).slice(0, 200);
+  }
+  return res;
 }
 
 function rateLimited(ip) {
@@ -55,6 +101,7 @@ function rateLimited(ip) {
 }
 
 export default async (req, context) => {
+  if (req.method === 'GET' && new URL(req.url).searchParams.has('tekshir')) return json(200, await checkSupabase());
   if (req.method !== 'POST') return json(405, { ok: false, error: 'Faqat POST so‘rov qabul qilinadi.' });
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
