@@ -12,7 +12,7 @@ const TABLE = 'buyurtmalar1';
 const TZ = 'Asia/Tashkent';
 const TZ_OFFSET_MS = 5 * 60 * 60 * 1000; // Toshkent: UTC+5, yozgi vaqt yo'q
 
-const MENU_HINT = 'Buyurtma berish uchun pastdagi «Menyu» tugmasini bosing';
+const MENU_HINT = 'Buyurtma berish uchun pastdagi «Afnan parfumes» tugmasini bosing';
 const HELP = [
   'Afnan parfume — buyurtmalar boti',
   '',

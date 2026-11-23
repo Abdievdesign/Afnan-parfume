@@ -1,6 +1,6 @@
 // Botni sozlash sahifasi: /api/telegram-setup
 // Ochilganda: webhook'ni shu saytdagi /api/telegram ga o'rnatadi, buyruqlar ro'yxatini va
-// «Menyu» tugmasini (saytni Telegram Mini App sifatida ochadi) sozlaydi, natijani o'zbekcha ko'rsatadi.
+// «Afnan parfumes» tugmasini (saytni Telegram Mini App sifatida ochadi) sozlaydi, natijani o'zbekcha ko'rsatadi.
 // Token sahifada hech qachon ko'rsatilmaydi.
 
 import { createHash } from 'node:crypto';
@@ -46,8 +46,8 @@ export default async req => {
       }, `Webhook o‘rnatish → ${origin}/api/telegram`);
       await tg('setMyCommands', { commands: COMMANDS }, 'Buyruqlar ro‘yxatini sozlash (/start, /bugun, /buyurtmalar)');
       await tg('setChatMenuButton', {
-        menu_button: { type: 'web_app', text: 'Menyu', web_app: { url: `${origin}/` } },
-      }, `«Menyu» tugmasi → ${origin}/`);
+        menu_button: { type: 'web_app', text: 'Afnan parfumes', web_app: { url: `${origin}/` } },
+      }, `«Afnan parfumes» tugmasi → ${origin}/`);
     }
   }
   if (!(process.env.TELEGRAM_CHAT_ID || '').trim())
