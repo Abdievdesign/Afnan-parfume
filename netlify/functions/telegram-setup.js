@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 const COMMANDS = [
   { command: 'start', description: 'Buyruqlar ro‘yxati' },
   { command: 'bugun', description: 'Bugungi buyurtmalar soni va summasi' },
+  { command: 'hafta', description: 'Oxirgi 7 kun savdosi' },
   { command: 'buyurtmalar', description: 'Oxirgi 10 ta buyurtma' },
 ];
 
@@ -44,7 +45,7 @@ export default async req => {
       await tg('setWebhook', {
         url: `${origin}/api/telegram`, secret_token: secret, allowed_updates: ['message'],
       }, `Webhook o‘rnatish → ${origin}/api/telegram`);
-      await tg('setMyCommands', { commands: COMMANDS }, 'Buyruqlar ro‘yxatini sozlash (/start, /bugun, /buyurtmalar)');
+      await tg('setMyCommands', { commands: COMMANDS }, 'Buyruqlar ro‘yxatini sozlash (/start, /bugun, /hafta, /buyurtmalar)');
       await tg('setChatMenuButton', {
         menu_button: { type: 'web_app', text: 'Afnan parfumes', web_app: { url: `${origin}/` } },
       }, `«Afnan parfumes» tugmasi → ${origin}/`);
