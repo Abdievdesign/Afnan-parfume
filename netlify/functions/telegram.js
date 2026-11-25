@@ -17,6 +17,7 @@ const HELP = [
   'Afnan parfume — buyurtmalar boti',
   '',
   '/bugun — bugungi buyurtmalar soni va jami summasi',
+  '/hafta — oxirgi 7 kun savdosi',
   '/buyurtmalar — oxirgi 10 ta buyurtma',
   '/start — buyruqlar ro‘yxati',
 ].join('\n');
@@ -51,6 +52,28 @@ async function today() {
   const sum = rows.reduce((s, r) => s + Number(r.jami || 0), 0);
   const date = start.toLocaleDateString('ru-RU', { timeZone: TZ });
   return `📅 Bugun (${date})\n\nBuyurtmalar soni: ${rows.length} ta\nJami summa: ${fmt(sum)}`;
+}
+
+async function week() {
+  // Oxirgi 7 kun: bugun va undan oldingi 6 kun (Toshkent vaqti bo'yicha)
+  const dayIdx = t => Math.floor((t + TZ_OFFSET_MS) / 86400000);
+  const todayIdx = dayIdx(Date.now());
+  const start = new Date((todayIdx - 6) * 86400000 - TZ_OFFSET_MS);
+  const rows = await supabase(`select=yaratilgan,jami&yaratilgan=gte.${encodeURIComponent(start.toISOString())}`);
+  const days = Array.from({ length: 7 }, () => ({ n: 0, sum: 0 }));
+  for (const r of rows) {
+    const d = days[dayIdx(Date.parse(r.yaratilgan)) - (todayIdx - 6)];
+    if (d) { d.n++; d.sum += Number(r.jami || 0); }
+  }
+  const label = i => new Date((todayIdx - 6 + i) * 86400000).toLocaleDateString('ru-RU', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
+  const total = days.reduce((s, d) => s + d.sum, 0), count = days.reduce((s, d) => s + d.n, 0);
+  return [
+    `📊 Oxirgi 7 kun (${label(0)} – ${label(6)})`,
+    '',
+    ...days.map((d, i) => `${label(i)}${i === 6 ? ' (bugun)' : ''}: ${d.n} ta · ${fmt(d.sum)}`),
+    '',
+    `Jami: ${count} ta buyurtma · ${fmt(total)}`,
+  ].join('\n');
 }
 
 async function latest() {
@@ -88,6 +111,7 @@ export default async req => {
     const cmd = (message.text || '').trim().split(/\s+/)[0].split('@')[0].toLowerCase();
     try {
       if (cmd === '/bugun') text = await today();
+      else if (cmd === '/hafta') text = await week();
       else if (cmd === '/buyurtmalar') text = await latest();
       else text = HELP;
     } catch (e) {
